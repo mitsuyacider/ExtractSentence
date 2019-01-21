@@ -9,11 +9,16 @@ from janome.analyzer import Analyzer
 from janome.tokenfilter import *
 from MorphologicalAnalysis import getWordsByMorphologicalAnalysis
 
+# NOTE: 文章を1文ずつ分解する
+# ref: https://teratail.com/questions/108738
 def getSplitedSentences(txt):
-    # sen = regex.split(r'(?<=[。？])(?!$)', txt, flags=regex.VERSION1)
     sen = re.findall(r'[^。]+(?:[。]|$)', txt)
     return sen
 
+# NOTE: 配列をcsv形式で保存する（既存データも上書き）
+#       @param dataList: 保存用データ
+#       @param fileName: 保存ファイル名(拡張なし)
+#       @param dataList: 保存用directory(current directoryからの相対パス)
 def saveDataList(dataList, fileName, directory):
     # NOTE: sentences directoryが存在していなければ作成して、
     #       sentences directoryにcsvファイルを保存する
@@ -30,6 +35,8 @@ def saveDataList(dataList, fileName, directory):
     dataWriter.writerows(dataList)
     f.close()
 
+# NOTE: 文章をリストにする
+#       @param sentences: フルテキスト
 def createSentenceData(sentences):
     # NOTE: column(縦）に文章を書き込んでいくため、
     #       2次元配列にする必要がある。
@@ -41,13 +48,14 @@ def createSentenceData(sentences):
     return rowList
 
 # NOTE: rowデータから形態素解析様の文章を作成する
+#       @param row: csvのrowデータ
 def prepareSentenceForAnalyzing(row):
-    sentences = row['説明文']
-    sentences += row['贈呈理由']
+    sentences = row['本文']
 
     return sentences
 
 # NOTE: 必要であれば、作家名や作品タイトルなどを加える
+#       @param row: csvのrowデータ
 def getExtraWords(row):
     words = []
     
@@ -57,24 +65,24 @@ def getExtraWords(row):
     words[0].append(2)
 
     return words
-
+    
 def main():
     csv_file = open("datalist.csv", "r")
     # NOTE: 辞書形式
     dataList = csv.DictReader(csv_file)
 
     for row in dataList:
-        splitedSentences = getSplitedSentences(row['説明文'])
+        splitedSentences = getSplitedSentences(row['本文'])
 
-        # TODO: データが少ないので、現状は「贈呈理由」も文章リストに加える
-        reasonSentences = getSplitedSentences(row['贈呈理由'])
-        splitedSentences.extend(reasonSentences)
-        
-        # 文章リストをcsv形式で保存する
+        # TODO: データが少ないので、現状は「作品名」も文章リストに加える
+        reasonSentences = getSplitedSentences(row['作品名'])
+
+        # NOTE: 文章リストをcsv形式で保存する
         saveSentences = createSentenceData(splitedSentences)
+        
+        # NOTE: 単語リストを作成する
         fileName = row['No.'] + '-sentences'
         saveDataList(saveSentences, fileName, 'sentences/')
-
         
         preparedWords = prepareSentenceForAnalyzing(row)
         saveWords = getWordsByMorphologicalAnalysis(preparedWords)
@@ -82,7 +90,6 @@ def main():
         # NOTE: 必要であれば、作家名や作品タイトルなどを加える
         # extraWords = getExtraWords(row)
         # saveWords.extend(extraWords)
-
 
         fileName = row['No.'] + '-words'
         saveDataList(saveWords, fileName, 'words/')

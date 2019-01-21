@@ -23,7 +23,7 @@ def getWordsByMorphologicalAnalysis(sentences):
     #       TokenCountFilter    入力文字列中の単語出現頻度を数える
     token_filters = [
         POSKeepFilter("名詞"),
-        POSStopFilter(["名詞,代名詞","名詞,非自立","名詞,数", "名詞,接尾,特殊", "名詞,接尾,一般", "名詞,接尾,形容動詞語幹"]),
+        POSStopFilter(["名詞,代名詞","名詞,非自立","名詞,数", "名詞,接尾,特殊", "名詞,接尾,一般", "名詞,接尾,形容動詞語幹", "名詞,接尾,サ変接続", "名詞,サ変接続"]),
         TokenCountFilter()]
 
     analyzer = Analyzer(token_filters=token_filters)
@@ -55,8 +55,9 @@ def saveDataList(dataList, fileName, directory):
     dataWriter.writerows(dataList)
     f.close()
 
-full_text =  "短編アニメーションという、自由度の高いパーソナルな表現単位を組み合わせて長編に見立てる試みは以前から数多く行われてきた。スタイルや方法論が異なり、バラバラになりがちな各々の作品を繋ぐルールとして日本独自の“連句”を導入したことで、従来とは一線を画する強い必然を持った一本の「長編」を構築したのが本作である。その短さから発表形態に制約を受けがちな短編アニメーションに対する新たな可能性の開拓と、日本独自の文化をアニメーションという表現を用いて発展させたことは、本年度最大の収穫といえよう。そして参加した作家陣の華やかな競演を、普段短編アニメーションに接することのない人たちにこそ観て欲しい。"
-words = getWordsByMorphologicalAnalysis(full_text)
+# NOTE: Test code here. Comment out following all codes.
+# full_text =  "皆が寝静まったころ、宙に浮いたようなベルトコンベアが静かに稼働している。そこは「D」「R」「E」「A」「M」という文字がつくられる工場。NHK教育テレビで放映している番組「Eテレ2355」のおやすみソングとして制作、放送されたアニメーション。でき上がった「DREAM」は、「おやすみなさい」と各国のことばで書かれた箱に詰められる。(3分46秒)"
+# words = getWordsByMorphologicalAnalysis(full_text)
 # print(words)
 # fileName = 'sample'
 # directory = 'words/'
